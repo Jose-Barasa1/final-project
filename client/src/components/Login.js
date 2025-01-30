@@ -1,4 +1,4 @@
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Field, Form, ErrorMessage } from 'formik';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import * as Yup from 'yup';
@@ -10,7 +10,7 @@ const Login = () => {
     try {
       const response = await axios.post('http://localhost:5000/login', values);
       localStorage.setItem('token', response.data.token);
-      history.push('/products');
+      history.push('/products'); // Redirect to the product page after login
     } catch (error) {
       console.error('Login failed');
     }
@@ -27,12 +27,12 @@ const Login = () => {
     >
       <Form>
         <div>
-          <Field name="email" type="email" placeholder="Email" />
-          <ErrorMessage name="email" />
+          <Field type="email" name="email" placeholder="Email" />
+          <ErrorMessage name="email" component="div" />
         </div>
         <div>
-          <Field name="password" type="password" placeholder="Password" />
-          <ErrorMessage name="password" />
+          <Field type="password" name="password" placeholder="Password" />
+          <ErrorMessage name="password" component="div" />
         </div>
         <button type="submit">Login</button>
       </Form>
