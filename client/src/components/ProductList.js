@@ -6,6 +6,7 @@ import { Button, Card, Row, Col } from 'react-bootstrap'; // Import Bootstrap co
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);  // Handle error state
+  const [successMessage, setSuccessMessage] = useState(''); // Success message state
   const token = localStorage.getItem('token');  // Ensure JWT token is retrieved
 
   useEffect(() => {
@@ -26,8 +27,36 @@ const ProductList = () => {
     }
   }, [token]);
 
+  const handleAddToOrder = async (productId) => {
+    if (!token) {
+      setError('Please log in to place an order.');
+      return;
+    }
+
+    try {
+      // Make the request to place an order for the selected product
+      const response = await axios.post(
+        'http://localhost:5000/order',
+        { product_id: productId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Success: Show success message and reset error
+      setSuccessMessage('Order placed successfully!');
+      setError(null);
+    } catch (error) {
+      // Handle error when placing the order
+      setError('Failed to place order.');
+      console.error('Error placing order:', error);
+    }
+  };
+
   if (error) {
     return <div className="alert alert-danger text-center">{error}</div>;  // Show error message if fetching fails
+  }
+
+  if (successMessage) {
+    return <div className="alert alert-success text-center">{successMessage}</div>;  // Show success message after order placement
   }
 
   return (
@@ -49,12 +78,13 @@ const ProductList = () => {
                     KSh {product.price}
                   </Card.Text>
                   <div className="d-flex justify-content-between">
-                    {/* Edit and Delete buttons with icons */}
-                    <Button variant="warning" size="sm">
-                      <i className="fas fa-edit"></i> Edit
-                    </Button>
-                    <Button variant="danger" size="sm">
-                      <i className="fas fa-trash"></i> Delete
+                    {/* Edit and Delete buttons removed for simplicity */}
+                    <Button 
+                      variant="primary" 
+                      size="sm" 
+                      onClick={() => handleAddToOrder(product.id)}
+                    >
+                      Add to Order
                     </Button>
                   </div>
                 </Card.Body>

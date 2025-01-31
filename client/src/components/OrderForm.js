@@ -1,18 +1,49 @@
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure you have Bootstrap imported
 
 const OrderForm = () => {
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState('');
+  const token = localStorage.getItem('token'); // Get the token from localStorage
+
+  // Fetch products from the server on component mount
+  useEffect(() => {
+    if (token) {
+      axios
+        .get('http://localhost:5000/products', {
+          headers: { Authorization: `Bearer ${token}` }, // Pass token in headers
+        })
+        .then((response) => {
+          setProducts(response.data); // Set products state with fetched data
+        })
+        .catch((error) => {
+          console.error('Error fetching products:', error);
+          setError('Failed to fetch products. Please try again.');
+        });
+    } else {
+      setError('Please log in to place an order.');
+    }
+  }, [token]);
+
   const handleSubmit = async (values) => {
     try {
-      await axios.post('http://localhost:5000/order', values);
+      // Include token in the request headers to authenticate the user
+      await axios.post('http://localhost:5000/order', values, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       alert('Order placed successfully!');
     } catch (error) {
       console.error('Error placing order:', error);
       alert('There was an error placing the order. Please try again.');
     }
   };
+
+  if (error) {
+    return <div className="alert alert-danger text-center">{error}</div>;
+  }
 
   return (
     <div className="container mt-5">
@@ -43,9 +74,11 @@ const OrderForm = () => {
                     <label htmlFor="product_id" className="form-label">Product</label>
                     <Field as="select" name="product_id" className="form-control">
                       <option value="">Select Product</option>
-                      <option value="1">Product 1</option>
-                      <option value="2">Product 2</option>
-                      {/* Add your options dynamically here */}
+                      {products.map((product) => (
+                        <option key={product.id} value={product.id}>
+                          {product.name} - KSh {product.price}
+                        </option>
+                      ))}
                     </Field>
                     <ErrorMessage name="product_id" component="div" className="text-danger" />
                   </div>

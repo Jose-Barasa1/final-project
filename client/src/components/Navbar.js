@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { FaHome, FaBox, FaList, FaSignInAlt, FaSignOutAlt, FaUserCircle } from 'react-icons/fa'; // FontAwesome icons
+import { FaHome, FaBox, FaList, FaSignInAlt, FaSignOutAlt, FaUserCircle, FaSearch } from 'react-icons/fa';
 
-const Navbar = ({ isLoggedIn, handleLogout }) => {
+const Navbar = ({ isLoggedIn, handleLogout, handleSearch }) => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
       <div className="container">
@@ -39,7 +39,23 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
               </Link>
             </li>
 
-            {/* Conditional Rendering: Show login/register or user-related options */}
+            {/* Search Bar */}
+            <li className="nav-item">
+              <form className="d-flex" onSubmit={(e) => e.preventDefault()}>
+                <input
+                  className="form-control me-2"
+                  type="search"
+                  placeholder="Search"
+                  aria-label="Search"
+                  onChange={handleSearch}  // Use handleSearch here
+                />
+                <button className="btn btn-outline-success" type="submit">
+                  <FaSearch size={18} />
+                </button>
+              </form>
+            </li>
+
+            {/* Conditional Rendering */}
             {!isLoggedIn ? (
               <>
                 <li className="nav-item">
