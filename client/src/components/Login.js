@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for React Router v6
 import * as Yup from 'yup';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Make sure you import Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS
 
 const Login = () => {
-  const history = useNavigate();
-  const [loginError, setLoginError] = useState(''); // Add a state to store login error
+  const navigate = useNavigate(); // Use navigate instead of history
+  const [loginError, setLoginError] = useState(''); // State to store error message
 
+  // Handle the form submission
   const handleSubmit = async (values) => {
     try {
+      // Send the login request
       const response = await axios.post('http://localhost:5000/login', values);
-      localStorage.setItem('token', response.data.token); // Save JWT token to localStorage
-      history.push('/products'); // Redirect to the products page after login
+      localStorage.setItem('token', response.data.token); // Store JWT token
+
+      // Redirect to the 'products' page
+      navigate('/products'); // Use navigate for redirection
     } catch (error) {
-      setLoginError('Invalid credentials or server error'); // Set error message
+      setLoginError('Invalid credentials or server error'); // Display error message
       console.error('Login failed', error);
     }
   };
@@ -42,7 +46,7 @@ const Login = () => {
                   email: Yup.string().email('Invalid email format').required('Required'),
                   password: Yup.string().required('Required'),
                 })}
-                onSubmit={handleSubmit}
+                onSubmit={handleSubmit} // Call handleSubmit on form submit
               >
                 <Form>
                   <div className="mb-3">
@@ -88,4 +92,3 @@ const Login = () => {
 };
 
 export default Login;
-
