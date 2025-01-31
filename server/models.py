@@ -1,4 +1,7 @@
-from app import db
+from flask_sqlalchemy import SQLAlchemy
+
+# Initialize the database instance
+db = SQLAlchemy()
 
 # User Model (for Mama Mboga and customers)
 class User(db.Model):

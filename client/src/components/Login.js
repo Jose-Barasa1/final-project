@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -6,14 +7,16 @@ import 'bootstrap/dist/css/bootstrap.min.css'; // Make sure you import Bootstrap
 
 const Login = () => {
   const history = useNavigate();
+  const [loginError, setLoginError] = useState(''); // Add a state to store login error
 
   const handleSubmit = async (values) => {
     try {
       const response = await axios.post('http://localhost:5000/login', values);
-      localStorage.setItem('token', response.data.token);
-      history.push('/products'); // Redirect to the product page after login
+      localStorage.setItem('token', response.data.token); // Save JWT token to localStorage
+      history.push('/products'); // Redirect to the products page after login
     } catch (error) {
-      console.error('Login failed');
+      setLoginError('Invalid credentials or server error'); // Set error message
+      console.error('Login failed', error);
     }
   };
 
@@ -28,6 +31,11 @@ const Login = () => {
               </h3>
             </div>
             <div className="card-body">
+              {loginError && (
+                <div className="alert alert-danger" role="alert">
+                  {loginError}
+                </div>
+              )}
               <Formik
                 initialValues={{ email: '', password: '' }}
                 validationSchema={Yup.object({
@@ -48,7 +56,7 @@ const Login = () => {
                     />
                     <ErrorMessage name="email" component="div" className="text-danger" />
                   </div>
-                  
+
                   <div className="mb-3">
                     <label htmlFor="password" className="form-label">Password</label>
                     <Field
@@ -80,3 +88,4 @@ const Login = () => {
 };
 
 export default Login;
+

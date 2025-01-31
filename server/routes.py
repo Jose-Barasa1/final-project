@@ -5,7 +5,8 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from flask_cors import CORS
 
 # Enable CORS to allow requests from different origins
-CORS(app)
+CORS(app, origins=["http://localhost:3000"], supports_credentials=True)
+
 
 # Register a new user (Mama Mboga or customer)
 @app.route('/register', methods=['POST'])
