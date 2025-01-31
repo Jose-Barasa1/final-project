@@ -36,6 +36,7 @@ def register():
     except Exception as e:
         return jsonify({"message": f"An error occurred: {str(e)}"}), 500
 
+
 # Login user and generate JWT token
 @app.route('/login', methods=['POST'])
 def login():
@@ -54,7 +55,8 @@ def login():
             return jsonify({'token': token}), 200
         return jsonify({"message": "Invalid credentials"}), 401
     except Exception as e:
-        return jsonify({"message": f"An error occurred: {str(e)}"}), 500
+        return jsonify({"message": f"An error occurred during login: {str(e)}"}), 500
+
 
 # CRUD for Product (only for vendors)
 @app.route('/products', methods=['POST'])
@@ -63,7 +65,7 @@ def add_product():
     try:
         current_user = get_jwt_identity()
         if current_user['role'] != 'vendor':
-            return jsonify({"message": "Unauthorized"}), 403
+            return jsonify({"message": "Unauthorized: Only vendors can add products"}), 403
 
         data = request.get_json()
         if not data or 'name' not in data or 'description' not in data or 'price' not in data:
@@ -77,13 +79,25 @@ def add_product():
     except Exception as e:
         return jsonify({"message": f"An error occurred: {str(e)}"}), 500
 
+
+# Get all products (for customers and vendors)
 @app.route('/products', methods=['GET'])
 def get_products():
     try:
         products = Product.query.all()
-        return jsonify([{"id": p.id, "name": p.name, "price": p.price} for p in products]), 200
+        product_list = [
+            {
+                "id": p.id, 
+                "name": p.name, 
+                "description": p.description,
+                "price": p.price,
+                "vendor_id": p.vendor_id
+            } for p in products
+        ]
+        return jsonify(product_list), 200
     except Exception as e:
         return jsonify({"message": f"An error occurred: {str(e)}"}), 500
+
 
 # Place an order (for customers)
 @app.route('/order', methods=['POST'])
@@ -91,8 +105,10 @@ def get_products():
 def place_order():
     try:
         current_user = get_jwt_identity()
+        if current_user['role'] != 'customer':  # Ensure only customers can place orders
+            return jsonify({"message": "Unauthorized: Only customers can place orders"}), 403
+
         data = request.get_json()
-        
         if 'product_id' not in data:
             return jsonify({"message": "Product ID is required"}), 400
         
@@ -108,6 +124,7 @@ def place_order():
         return jsonify({"message": "Order placed successfully"}), 201
     except Exception as e:
         return jsonify({"message": f"An error occurred: {str(e)}"}), 500
+
 
 # View orders (for customers or vendors)
 @app.route('/orders', methods=['GET'])

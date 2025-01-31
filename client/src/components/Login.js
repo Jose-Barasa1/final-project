@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for React Router v6
@@ -9,17 +9,26 @@ const Login = () => {
   const navigate = useNavigate(); // Use navigate instead of history
   const [loginError, setLoginError] = useState(''); // State to store error message
 
+  useEffect(() => {
+    // Check if the user is already logged in by looking for a token in localStorage
+    if (localStorage.getItem('token')) {
+      navigate('/products'); // Redirect to the products page if already logged in
+    }
+  }, [navigate]);
+
   // Handle the form submission
   const handleSubmit = async (values) => {
     try {
       // Send the login request
       const response = await axios.post('http://localhost:5000/login', values);
-      localStorage.setItem('token', response.data.token); // Store JWT token
 
-      // Redirect to the 'products' page
-      navigate('/products'); // Use navigate for redirection
+      // Store JWT token in localStorage
+      localStorage.setItem('token', response.data.token);
+
+      // Redirect to the 'products' page after successful login
+      navigate('/products');
     } catch (error) {
-      setLoginError('Invalid credentials or server error'); // Display error message
+      setLoginError(error.response?.data?.message || 'Invalid credentials or server error'); // Display error message
       console.error('Login failed', error);
     }
   };
