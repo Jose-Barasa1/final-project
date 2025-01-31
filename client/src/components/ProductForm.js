@@ -1,10 +1,27 @@
+import React, { useState, useEffect } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import axios from 'axios';
 import * as Yup from 'yup';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Make sure Bootstrap CSS is imported
+import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is imported
 
 const ProductForm = ({ product }) => {
-  // Handle submit (add or update product)
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch products when the component mounts
+  useEffect(() => {
+    axios.get('http://localhost:5000/products')
+      .then((response) => {
+        setProducts(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching products:', error);
+        setLoading(false);
+      });
+  }, []);
+
+  // Handle product submission (add or update)
   const handleSubmit = async (values) => {
     try {
       if (product) {
@@ -19,6 +36,26 @@ const ProductForm = ({ product }) => {
     } catch (error) {
       console.error('Error saving product:', error);
       alert('There was an error saving the product. Please try again.');
+    }
+  };
+
+  // Handle placing an order for a product
+  const handleOrder = async (productId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('You need to be logged in to place an order!');
+      return;
+    }
+    try {
+      await axios.post('http://localhost:5000/order', { product_id: productId }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      alert('Order placed successfully!');
+    } catch (error) {
+      console.error('Error placing order:', error);
+      alert('There was an error placing your order. Please try again.');
     }
   };
 
@@ -90,6 +127,40 @@ const ProductForm = ({ product }) => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Displaying the list of fetched products for placing an order */}
+      <div className="mt-5">
+        <h4 className="text-center">Available Products</h4>
+        {loading ? (
+          <div className="text-center">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        ) : (
+          <div className="row">
+            {products.map((prod) => (
+              <div key={prod.id} className="col-md-4 mb-4">
+                <div className="card shadow-lg">
+                  <img
+                    src="https://via.placeholder.com/150"
+                    alt={prod.name}
+                    className="card-img-top"
+                  />
+                  <div className="card-body">
+                    <h5 className="card-title">{prod.name}</h5>
+                    <p className="card-text">{prod.description}</p>
+                    <p className="card-text"><strong>KSh {prod.price}</strong></p>
+                    <button className="btn btn-success btn-sm w-100" onClick={() => handleOrder(prod.id)}>
+                      <i className="fas fa-cart-plus"></i> Place Order
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

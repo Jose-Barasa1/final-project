@@ -1,7 +1,9 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Make sure to import Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { FaHome, FaBox, FaList, FaSignInAlt, FaSignOutAlt, FaUserCircle } from 'react-icons/fa'; // FontAwesome icons
 
-const Navbar = () => {
+const Navbar = ({ isLoggedIn, handleLogout }) => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
       <div className="container">
@@ -23,24 +25,43 @@ const Navbar = () => {
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
               <Link className="nav-link" to="/">
-                <i className="fas fa-home"></i> Home
+                <FaHome size={20} className="mr-2" /> {/* Home Icon */}
               </Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/products">
-                <i className="fas fa-box"></i> Products
+                <FaBox size={20} className="mr-2" /> {/* Products Icon */}
               </Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/orders">
-                <i className="fas fa-list"></i> Orders
+                <FaList size={20} className="mr-2" /> {/* Orders Icon */}
               </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/login">
-                <i className="fas fa-sign-in-alt"></i> Login
-              </Link>
-            </li>
+
+            {/* Conditional Rendering: Show login/register or user-related options */}
+            {!isLoggedIn ? (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/login">
+                    <FaSignInAlt size={20} className="mr-2" /> {/* Login Icon */}
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/profile">
+                    <FaUserCircle size={20} className="mr-2" /> {/* Profile Icon */}
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <button className="btn nav-link text-danger" onClick={handleLogout}>
+                    <FaSignOutAlt size={20} className="mr-2" /> {/* Logout Icon */}
+                  </button>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

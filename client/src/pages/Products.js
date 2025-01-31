@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import Draggable from 'react-draggable'; // Import react-draggable
+import { toast } from 'react-toastify'; // Add react-toastify for notifications
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -19,11 +21,16 @@ const Products = () => {
       .catch(error => {
         console.error('Error fetching products:', error);
         setLoading(false);
+        toast.error('Failed to fetch products!'); // Show error toast
       });
   }, []);
 
   if (loading) {
-    return <div className="text-center"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>;
+    return <div className="text-center">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>;
   }
 
   const handleDelete = (productId) => {
@@ -32,8 +39,12 @@ const Products = () => {
       axios.delete(`http://localhost:5000/products/${productId}`)
         .then(() => {
           setProducts(products.filter(product => product.id !== productId));
+          toast.success('Product deleted successfully!');
         })
-        .catch(error => console.error('Error deleting product:', error));
+        .catch(error => {
+          console.error('Error deleting product:', error);
+          toast.error('Failed to delete product.');
+        });
     }
   };
 
@@ -46,7 +57,7 @@ const Products = () => {
             <Draggable>
               <div className="card shadow-lg">
                 <img
-                  src={product.image || 'https://via.placeholder.com/150'}
+                  src={product.image || 'https://via.placeholder.com/150'} // Use product image if available
                   alt={product.name}
                   className="card-img-top"
                 />

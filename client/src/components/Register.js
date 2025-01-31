@@ -23,35 +23,18 @@ const Register = () => {
       <div className="card shadow-lg p-4" style={{ width: '400px' }}>
         <h3 className="text-center mb-4">Register</h3>
         <Formik
-          initialValues={{ username: '', email: '', password: '', confirmPassword: '', role: '' }} // Added role
+          initialValues={{ email: '', password: '', confirmPassword: '', role: '' }} // Removed username field
           validationSchema={Yup.object({
-            username: Yup.string().required('Username is required'),
             email: Yup.string().email('Invalid email').required('Email is required'),
             password: Yup.string().required('Password is required'),
             confirmPassword: Yup.string()
               .oneOf([Yup.ref('password'), null], 'Passwords must match')
               .required('Confirm Password is required'),
-            role: Yup.string().required('Role is required'), // Added validation for role
+            role: Yup.string().required('Role is required'), // Role validation
           })}
           onSubmit={handleSubmit}
         >
           <Form>
-            {/* Username */}
-            <div className="mb-3">
-              <div className="input-group">
-                <span className="input-group-text">
-                  <i className="fas fa-user"></i>
-                </span>
-                <Field
-                  type="text"
-                  name="username"
-                  className="form-control"
-                  placeholder="Username"
-                />
-              </div>
-              <ErrorMessage name="username" component="div" className="text-danger mt-1" />
-            </div>
-
             {/* Email */}
             <div className="mb-3">
               <div className="input-group">
