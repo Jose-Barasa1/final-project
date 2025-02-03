@@ -10,19 +10,19 @@ const OrdersList = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const token = localStorage.getItem('token');  // Retrieve the JWT token from localStorage
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     if (!token) {
       setError('Please log in to view your orders.');
       setLoading(false);
-      navigate('/login'); // Redirect to login page if token doesn't exist
+      navigate('/login');
       return;
     }
 
     axios
       .get('http://localhost:5000/orders', {
-        headers: { Authorization: `Bearer ${token}` }, // Add token to the request headers
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
         setOrders(response.data);
@@ -32,7 +32,7 @@ const OrdersList = () => {
         console.error('Error fetching orders:', error);
         if (error.response && error.response.status === 401) {
           setError('Unauthorized access. Please log in again.');
-          navigate('/login');  // Redirect to login if token is invalid
+          navigate('/login');
         } else if (error.response && error.response.status === 403) {
           setError('Forbidden access. You do not have permission to view these orders.');
         } else {
@@ -112,4 +112,3 @@ const OrdersList = () => {
 };
 
 export default OrdersList;
-

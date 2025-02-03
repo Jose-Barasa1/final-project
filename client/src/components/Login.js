@@ -1,35 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for React Router v6
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Login = () => {
-  const navigate = useNavigate(); // Use navigate instead of history
-  const [loginError, setLoginError] = useState(''); // State to store error message
+  const navigate = useNavigate();
+  const [loginError, setLoginError] = useState('');
 
   useEffect(() => {
-    // Check if the user is already logged in by looking for a token in localStorage
-    if (localStorage.getItem('token')) {
-      navigate('/products'); // Redirect to the products page if already logged in
-    }
+    if (localStorage.getItem('token')) navigate('/products');
   }, [navigate]);
 
-  // Handle the form submission
   const handleSubmit = async (values) => {
     try {
-      // Send the login request
       const response = await axios.post('http://localhost:5000/login', values);
-
-      // Store JWT token in localStorage
       localStorage.setItem('token', response.data.token);
-
-      // Redirect to the 'products' page after successful login
       navigate('/products');
     } catch (error) {
-      setLoginError(error.response?.data?.message || 'Invalid credentials or server error'); // Display error message
-      console.error('Login failed', error);
+      setLoginError(error.response?.data?.message || 'Invalid credentials');
     }
   };
 
@@ -38,60 +28,34 @@ const Login = () => {
       <div className="row justify-content-center">
         <div className="col-md-6">
           <div className="card shadow-lg">
-            <div className="card-header bg-primary text-white text-center">
-              <h3>
-                <i className="fas fa-user-circle"></i> Login
-              </h3>
-            </div>
+            <div className="card-header bg-primary text-white text-center"><h3>Login</h3></div>
             <div className="card-body">
-              {loginError && (
-                <div className="alert alert-danger" role="alert">
-                  {loginError}
-                </div>
-              )}
+              {loginError && <div className="alert alert-danger">{loginError}</div>}
               <Formik
                 initialValues={{ email: '', password: '' }}
                 validationSchema={Yup.object({
-                  email: Yup.string().email('Invalid email format').required('Required'),
+                  email: Yup.string().email('Invalid email').required('Required'),
                   password: Yup.string().required('Required'),
                 })}
-                onSubmit={handleSubmit} // Call handleSubmit on form submit
+                onSubmit={handleSubmit}
               >
                 <Form>
                   <div className="mb-3">
                     <label htmlFor="email" className="form-label">Email</label>
-                    <Field
-                      type="email"
-                      name="email"
-                      id="email"
-                      className="form-control"
-                      placeholder="Enter your email"
-                    />
+                    <Field type="email" name="email" id="email" className="form-control" />
                     <ErrorMessage name="email" component="div" className="text-danger" />
                   </div>
-
                   <div className="mb-3">
                     <label htmlFor="password" className="form-label">Password</label>
-                    <Field
-                      type="password"
-                      name="password"
-                      id="password"
-                      className="form-control"
-                      placeholder="Enter your password"
-                    />
+                    <Field type="password" name="password" id="password" className="form-control" />
                     <ErrorMessage name="password" component="div" className="text-danger" />
                   </div>
-
-                  <button type="submit" className="btn btn-primary w-100 mt-3">
-                    <i className="fas fa-sign-in-alt"></i> Login
-                  </button>
+                  <button type="submit" className="btn btn-primary w-100 mt-3">Login</button>
                 </Form>
               </Formik>
             </div>
             <div className="card-footer text-center">
-              <p>
-                Don't have an account? <a href="/register" className="text-primary">Sign Up</a>
-              </p>
+              <p>Don't have an account? <a href="/register" className="text-primary">Sign Up</a></p>
             </div>
           </div>
         </div>

@@ -38,9 +38,6 @@ const Register = () => {
             {/* Email */}
             <div className="mb-3">
               <div className="input-group">
-                <span className="input-group-text">
-                  <i className="fas fa-envelope"></i>
-                </span>
                 <Field
                   type="email"
                   name="email"
@@ -54,9 +51,6 @@ const Register = () => {
             {/* Password */}
             <div className="mb-3">
               <div className="input-group">
-                <span className="input-group-text">
-                  <i className="fas fa-lock"></i>
-                </span>
                 <Field
                   type="password"
                   name="password"
@@ -70,9 +64,6 @@ const Register = () => {
             {/* Confirm Password */}
             <div className="mb-3">
               <div className="input-group">
-                <span className="input-group-text">
-                  <i className="fas fa-lock"></i>
-                </span>
                 <Field
                   type="password"
                   name="confirmPassword"
@@ -86,9 +77,6 @@ const Register = () => {
             {/* Role */}
             <div className="mb-3">
               <div className="input-group">
-                <span className="input-group-text">
-                  <i className="fas fa-user-shield"></i>
-                </span>
                 <Field
                   as="select"
                   name="role"
@@ -105,7 +93,7 @@ const Register = () => {
             {/* Submit Button */}
             <div className="d-grid gap-2">
               <button type="submit" className="btn btn-primary">
-                Register <i className="fas fa-user-plus"></i>
+                Register
               </button>
             </div>
           </Form>

@@ -71,7 +71,6 @@ const ProductList = () => {
           {products.map((product) => (
             <Col key={product.id} md={4} className="mb-4">
               <Card>
-                <Card.Img variant="top" src={product.image || "https://via.placeholder.com/300"} />
                 <Card.Body>
                   <Card.Title>{product.name}</Card.Title>
                   <Card.Text>
