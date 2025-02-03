@@ -6,7 +6,9 @@ import Orders from './pages/OrdersList';
 import Login from './components/Login';
 import Register from './components/Register';
 import Cart from './components/Cart';
+import Checkout from './components/Checkout';
 import { useState, useEffect } from 'react';
+import OrderDetails from './components/OrderDetails';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -40,6 +42,9 @@ function App() {
         <Route path="/products" element={<Products searchQuery={searchQuery} addToCart={addToCart} />} />
         <Route path="/cart" element={<Cart cartItems={cartItems} removeFromCart={removeFromCart} />} />
         <Route path="/orders" element={<Orders />} />
+        
+        <Route path="/order-details/:id" element={<OrderDetails />} />
+        <Route path="/checkout" element={<Checkout />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>

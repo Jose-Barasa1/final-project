@@ -1,3 +1,4 @@
+// OrdersList.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -42,8 +43,14 @@ const OrdersList = () => {
       });
   }, [token, navigate]);
 
+  // Updated: Navigate to order details page
   const handleViewDetails = (orderId) => {
     navigate(`/order-details/${orderId}`);
+  };
+
+  // Separate checkout button for finalizing orders (optional)
+  const handleCheckout = () => {
+    navigate('/checkout');
   };
 
   if (loading) {
@@ -97,10 +104,17 @@ const OrdersList = () => {
                   size="2x"
                 />
                 <button
-                  className="btn btn-info btn-sm"
+                  className="btn btn-info btn-sm me-2"
                   onClick={() => handleViewDetails(order.id)}
                 >
                   <i className="fas fa-eye"></i> View Details
+                </button>
+                {/* Optional: Separate checkout button */}
+                <button
+                  className="btn btn-success btn-sm"
+                  onClick={handleCheckout}
+                >
+                  Checkout
                 </button>
               </div>
             </div>

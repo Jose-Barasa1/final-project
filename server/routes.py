@@ -209,3 +209,42 @@ def remove_from_cart(product_id):
     except Exception as e:
         print("Error in remove_from_cart:", e)
         return jsonify({"message": f"An error occurred: {str(e)}"}), 500
+    
+@app.route('/checkout', methods=['POST'])
+@jwt_required()
+def checkout():
+    try:
+        # Get the customer ID from the token (convert to integer)
+        user_id = int(get_jwt_identity())
+        claims = get_jwt()
+        if claims.get('role') != 'customer':
+            return jsonify({"message": "Unauthorized"}), 403
+
+        # Fetch all orders for the customer with status 'processing'
+        orders = Order.query.filter_by(customer_id=user_id, status='processing').all()
+        if not orders:
+            return jsonify({"message": "No orders to checkout"}), 400
+
+        for order in orders:
+            # Update order status to 'completed'
+            order.status = 'completed'
+            db.session.add(order)
+           
+            # Access the delivery as a single object now
+            if order.delivery:
+                order.delivery.delivery_status = 'in transit'
+                db.session.add(order.delivery)
+            else:
+                # Create a new delivery record if it doesn't exist
+                new_delivery = Delivery(order_id=order.id, delivery_status='in transit')
+                db.session.add(new_delivery)
+
+        db.session.commit()
+        return jsonify({"message": "Checkout successful. Delivery has started."}), 200
+
+    except Exception as e:
+        print("Error in checkout:", e)
+        return jsonify({"message": f"An error occurred during checkout: {str(e)}"}), 500
+
+
+
