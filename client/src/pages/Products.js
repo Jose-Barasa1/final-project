@@ -22,8 +22,16 @@ const Products = ({ searchQuery }) => {
 
     if (!token) { toast.error('Please log in to add items to your cart'); return; }
     if (quantity <= 0 || isNaN(quantity)) { toast.error('Quantity must be a positive integer'); return; }
-
-    axios.post('http://localhost:5000/cart', { product_id: productId, quantity }, { headers: { Authorization: `Bearer ${token}` } })
+    axios.post(
+      'http://localhost:5000/cart', 
+      { product_id: productId, quantity }, 
+      { 
+        headers: { 
+          'Content-Type': 'application/json', 
+          Authorization: `Bearer ${token}` 
+        } 
+      }
+    )
       .then(() => { toast.success('Item added to cart!'); setQuantities(prev => ({ ...prev, [productId]: 1 })); })
       .catch(() => { toast.error('Failed to add item to cart'); });
   };
