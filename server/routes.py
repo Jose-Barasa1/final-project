@@ -80,33 +80,50 @@ def get_products():
 @jwt_required()
 def place_order():
     try:
-        # Convert the identity (user id) to integer for database queries.
+        # Get the user id from the token and convert it to an integer for DB queries.
         user_id = int(get_jwt_identity())
-        claims = get_jwt()  # Additional claims (like role)
+        claims = get_jwt()  # Additional claims (such as role)
+        print("User ID:", user_id)
+        print("Claims:", claims)
+
+        # Check if the user role is 'customer'
         if claims.get('role') != 'customer':
             return jsonify({"message": "Unauthorized"}), 403
 
+        # Get the JSON payload from the request
         data = request.get_json()
+        print("Received order payload:", data)
         if not data or 'cart_items' not in data:
             return jsonify({"message": "Cart items are required"}), 400
 
+        order_count = 0
+
+        # Iterate over each item in the cart_items array
         for item in data['cart_items']:
             if 'product_id' not in item or 'quantity' not in item:
                 return jsonify({"message": "Product ID and quantity are required"}), 400
 
+            # Create a new order
             new_order = Order(
                 customer_id=user_id,
                 product_id=item['product_id'],
                 status='processing'
             )
             db.session.add(new_order)
-            db.session.commit()
+            db.session.commit()  # Commit so that new_order.id is generated
+            print(f"Created order: {new_order.id} for product {item['product_id']} with quantity {item['quantity']}")
 
+            # Create a corresponding delivery record
             new_delivery = Delivery(order_id=new_order.id, delivery_status='on the way')
             db.session.add(new_delivery)
             db.session.commit()
+            print(f"Created delivery for order: {new_order.id}")
 
+            order_count += 1
+
+        print(f"Total orders created: {order_count}")
         return jsonify({"message": "Order placed successfully"}), 201
+
     except Exception as e:
         print("Error in place_order:", e)
         return jsonify({"message": f"An error occurred: {str(e)}"}), 500
@@ -121,19 +138,20 @@ def view_orders():
             return jsonify({"message": "Unauthorized"}), 403
 
         orders = Order.query.filter_by(customer_id=user_id).all()
-        return jsonify([
+        orders_list = [
             {
                 "id": o.id,
                 "status": o.status,
                 "product_id": o.product_id,
                 "product_name": o.product.name,
-                "delivery_status": o.delivery.delivery_status if o.delivery else 'N/A'
+                # Check if o.delivery has at least one element.
+                "delivery_status": o.delivery[0].delivery_status if o.delivery and len(o.delivery) > 0 else 'N/A'
             } for o in orders
-        ]), 200
+        ]
+        return jsonify(orders_list), 200
     except Exception as e:
         print("Error in view_orders:", e)
         return jsonify({"message": f"An error occurred: {str(e)}"}), 500
-
 @app.route('/cart', methods=['POST'])
 @jwt_required()
 def add_to_cart():
